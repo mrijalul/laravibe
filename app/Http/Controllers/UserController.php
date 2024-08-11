@@ -37,7 +37,7 @@ class UserController extends Controller
 	{
 		// dd($request->all());
 		$request->validate([
-			'name' => 'required|string|max:255',
+			'name' 	=> 'required|string|max:255',
 			'email' => [
 				'required',
 				'string',
@@ -46,10 +46,18 @@ class UserController extends Controller
 				Rule::unique('users')->ignore($request->user_id, 'uuid'),
 			],
 			'password' => $request->user_id ? 'nullable|string|min:8' : 'required|string|min:8',
+		], [
+			'name.required' 	=> 'Nama tidak boleh kosong.',
+			'name.max' 			=> 'Nama tidak boleh lebih dari 255 karakter.',
+			'email.required' 	=> 'Email wajib diisi.',
+			'email.email' 		=> 'Format email tidak valid.',
+			'email.unique' 		=> 'Email ini sudah terdaftar.',
+			'password.required' => 'Password wajib diisi.',
+			'password.min' 		=> 'Password harus memiliki minimal 8 karakter.',
 		]);
 
 		$data = [
-			'name' => $request->name,
+			'name' 	=> $request->name,
 			'email' => $request->email,
 		];
 
@@ -58,14 +66,16 @@ class UserController extends Controller
 		}
 
 		if ($request->user_id) {
-			$user = User::where('uuid', $request->user_id)->firstOrFail();
+			$user 		= User::where('uuid', $request->user_id)->firstOrFail();
 			$user->update($data);
+			$message 	= 'User berhasil diperbarui.';
 		} else {
-			$data['uuid'] = (string) Str::uuid();
-			$user = User::create($data);
+			$data['uuid'] 	= (string) Str::uuid();
+			$user 			= User::create($data);
+			$message 		= 'User baru berhasil ditambahkan.';
 		}
 
-		return response()->json(['success' => 'User saved successfully.']);
+		return response()->json(['success' => $message]);
 	}
 
 	function edit(string $uuid)

@@ -14,6 +14,7 @@
                         <div class="col-sm-12">
                             <input type="text" class="form-control editName" id="name" name="name"
                                 placeholder="Enter Name" value="" maxlength="50" required="">
+                            <div class="text-danger"></div>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -21,6 +22,7 @@
                         <div class="col-sm-12">
                             <input type="email" id="email" name="email" required="" placeholder="Enter Email"
                                 class="form-control editEmail">
+                            <div class="text-danger"></div>
                         </div>
                     </div>
                     <div class="mb-3">
@@ -29,6 +31,7 @@
                             <input type="password" id="password" name="password" placeholder="Enter Password"
                                 class="form-control" minlength="8">
                             <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah password.</small>
+                            <div class="text-danger"></div>
                         </div>
                     </div>
                 </div>

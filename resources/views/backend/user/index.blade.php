@@ -45,11 +45,15 @@
 
 @push('styles')
 <link rel="stylesheet" href="https://cdn.datatables.net/2.1.3/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.css">
+
 @endpush
 
 @push('scripts')
 <script src="https://cdn.datatables.net/2.1.3/js/dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/2.1.3/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-toast-plugin/1.3.2/jquery.toast.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(function () {
         $.ajaxSetup({
@@ -57,6 +61,12 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+
+        $('input').on('input', function () {
+            $(this).removeClass('is-invalid');
+            $(this).next('.text-danger').remove();  // Menghapus pesan error di bawah input
+        });
+
 
         function resetForm() {
             $('#userForm').trigger("reset");
@@ -90,7 +100,6 @@
 
         $('body').on('click', '.editData', function () {
             var uuid = $(this).data('uuid');
-            console.log('user uuid : ', uuid);
             resetForm();
 
             $.ajax({
@@ -123,12 +132,46 @@
                 dataType: 'json',
                 success: function (data) {
                     resetForm();  // Reset form setelah data disimpan
+                    
                     $('#ajaxModal').modal('hide');
+                    
                     table.draw();
+
+                    // Menghapus semua kelas is-invalid dan pesan error
+                    $('input').removeClass('is-invalid');
+                    $('.text-danger').remove();
+
+                    $.toast({
+                        heading: 'Success',
+                        text: data.success,
+                        showHideTransition: 'slide',
+                        icon: 'success',
+                        position: 'top-right'
+                    });
                 },
                 error: function (data) {
-                    console.log('Error:', data);
                     $('#saveBtn').html('Save changes');
+                    
+                    // Clear previous error messages
+                    $('.text-danger').remove();
+                    
+                    // Display error messages below each input
+                    if (data.responseJSON && data.responseJSON.errors) {
+                        $.each(data.responseJSON.errors, function (key, value) {
+                            let input = $('input[name=' + key + ']');
+                            input.addClass('is-invalid');
+                            input.after('<div class="text-danger">' + value[0] + '</div>');
+                        });
+                    }
+
+                    // Display toast notification
+                    $.toast({
+                        heading: 'Error',
+                        text: 'Please fix the errors and try again.',
+                        showHideTransition: 'fade',
+                        icon: 'error',
+                        position: 'top-right'
+                    });
                 }
             });
         });
@@ -136,18 +179,38 @@
         $('body').on('click', '.deleteData', function () {
             var uuid = $(this).data("uuid");
 
-            if (confirm("Apakah Anda yakin ingin menghapus data ini?")) {
-                $.ajax({
-                    url: "{{ route('lv-admin.users.user.destroy', ':uuid') }}".replace(':uuid', uuid),
-                    type: "DELETE",
-                    success: function (data) {
-                        table.draw();
-                    },
-                    error: function (data) {
-                        console.log('Error:', data);
-                    }
-                });
-            }
+            Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda tidak akan bisa mengembalikan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: "{{ route('lv-admin.users.user.destroy', ':uuid') }}".replace(':uuid', uuid),
+                        type: "DELETE",
+                        success: function (data) {
+                            table.draw();
+                            Swal.fire(
+                                'Deleted!',
+                                'Data berhasil dihapus.',
+                                'success'
+                            );
+                        },
+                        error: function (data) {
+                            console.log('Error:', data);
+                            Swal.fire(
+                                'Error!',
+                                'Terjadi kesalahan saat menghapus data.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
         });
 
     })

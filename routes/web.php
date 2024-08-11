@@ -27,6 +27,6 @@ Route::prefix('lv-admin')->name('lv-admin.')->middleware('web')->group(function 
     // group users
     Route::prefix('users')->name('users.')->group(function () {
         Route::post('user/get-data', [UserController::class, 'getdata'])->name('getdata');
-        Route::resource('user', UserController::class);
+        Route::resource('user', UserController::class)->only('index', 'store', 'destroy', 'edit');
     });
 });
