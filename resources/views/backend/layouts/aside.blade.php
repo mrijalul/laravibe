@@ -3,9 +3,20 @@
 	<ul class="sidebar-nav" id="sidebar-nav">
 
 		<li class="nav-item">
-			<a class="nav-link " href="{{ route('lv-admin.dashboard') }}">
+			<a class="nav-link {{ (request()->is('lv-admin/dashboard')) ? '' : 'collapsed' }}"
+				href="{{ route('lv-admin.dashboard') }}">
 				<i class="bi bi-grid"></i>
 				<span>Dashboard</span>
+			</a>
+		</li>
+
+		<li class="nav-heading">Data Master</li>
+
+		<li class="nav-item">
+			<a class="nav-link {{ (request()->is('lv-admin/users/*')) ? '' : 'collapsed' }}"
+				href="{{ route('lv-admin.users.user.index') }}">
+				<i class="bi bi-people"></i>
+				<span>Users</span>
 			</a>
 		</li>
 

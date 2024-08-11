@@ -25,6 +25,7 @@
         integrity="sha512-dPXYcDub/aeb08c63jRq/k6GaKccl256JQy/AnOq7CAnEZ9FzSL9wSbcZkMp4R26vBsMLFYH4kQ67/bbV8XaCQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="{{ asset('assets/css/lv-style.css') }}" rel="stylesheet">
+    @stack('styles')
 </head>
 
 <body>
@@ -55,6 +56,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="{{ asset('assets/js/lv-validate.js') }}"></script>
     <script src="{{ asset('assets/js/lv-main.js') }}"></script>
+    @stack('scripts')
 </body>
 
 </html>

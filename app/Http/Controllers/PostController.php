@@ -2,63 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 class PostController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    function index()
-    {
-        //
-    }
+	function getdata(Request $request)
+	{
+		if ($request->ajax()) {
+			$data = Post::latest();
+			return DataTables::of($data)
+				->addColumn('action', function ($row) {
+					$btn = '<a href="javascript:void(0)" data-id="' . $row->id . '" class="edit btn btn-warning btn-sm editData">Edit</a>';
+					$btn .= ' <a href="javascript:void(0)" data-id="' . $row->id . '" class="btn btn-danger btn-sm deleteData">Delete</a>';
+					return $btn;
+				})
+				->rawColumns(['action'])
+				->make(true);
+		}
+	}
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    function create()
-    {
-        //
-    }
+	function index()
+	{
+		//
+	}
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    function store(Request $request)
-    {
-        //
-    }
+	function create()
+	{
+		//
+	}
 
-    /**
-     * Display the specified resource.
-     */
-    function show(string $id)
-    {
-        //
-    }
+	function store(Request $request)
+	{
+		//
+	}
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    function edit(string $id)
-    {
-        //
-    }
+	function show(string $id)
+	{
+		//
+	}
 
-    /**
-     * Update the specified resource in storage.
-     */
-    function update(Request $request, string $id)
-    {
-        //
-    }
+	function edit(string $id)
+	{
+		//
+	}
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    function destroy(string $id)
-    {
-        //
-    }
+	function update(Request $request, string $id)
+	{
+		//
+	}
+
+	function destroy(string $id)
+	{
+		//
+	}
 }
