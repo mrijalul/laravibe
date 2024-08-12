@@ -13,7 +13,7 @@ class UserController extends Controller
 	function getdata(Request $request)
 	{
 		if ($request->ajax()) {
-			$data = User::select(['uuid', 'name', 'email', 'updated_at']);
+			$data = User::select(['uuid', 'name', 'email', 'updated_at', 'created_at'])->orderBy('created_at', 'desc');
 			return DataTables::of($data)
 				->addColumn('updated_at', function ($row) {
 					return $row->updated_at->format('Y-m-d H:i:s');
