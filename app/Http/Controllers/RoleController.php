@@ -14,8 +14,17 @@ class RoleController extends Controller
 	function getdata(Request $request)
 	{
 		if ($request->ajax()) {
-			$data = Role::select(['uuid', 'name', 'created_at'])->orderBy('created_at', 'desc');
+			$data = Role::with('users')->select(['id', 'uuid', 'name', 'created_at'])->orderBy('created_at', 'desc');
 			return DataTables::of($data)
+				->addColumn('users', function ($row) {
+					if ($row->users->isEmpty()) {
+						return '<span class="badge text-bg-warning">Belum memiliki relasi</span>';
+					} else {
+						return $row->users->map(function ($user) {
+							return '<span class="badge text-bg-success">' . $user->name . '</span>';
+						})->implode(' ');
+					}
+				})
 				->addColumn('action', function ($row) {
 					return '
                     <button class="btn btn-sm btn-warning editData" data-uuid="' . $row->uuid . '"><i class="bi bi-pencil-square"></i></button>
@@ -23,7 +32,7 @@ class RoleController extends Controller
                     <button class="btn btn-sm btn-info assignRole" data-rolename="' . $row->name . '" data-uuid="' . $row->uuid . '"><i class="bi bi-person-plus"></i></button>
                 ';
 				})
-				->rawColumns(['action'])
+				->rawColumns(['action', 'users'])
 				->make(true);
 		}
 	}
@@ -92,20 +101,16 @@ class RoleController extends Controller
 
 	function assignRole(Request $request)
 	{
-		// Validasi input
 		$request->validate([
 			'user_id' => 'required|array',
 			'user_id.*' => 'exists:users,uuid',
 			'role_id' => 'required|exists:roles,uuid',
 		]);
 
-		// Temukan role berdasarkan UUID
 		$role = Role::where('uuid', $request->role_id)->firstOrFail();
 
-		// Temukan semua users berdasarkan UUID
 		$user_ids = User::whereIn('uuid', $request->user_id)->pluck('id');
 
-		// Assign role ke users
 		$role->users()->sync($user_ids);
 
 		return response()->json(['success' => 'Role berhasil ditambahkan ke user.']);

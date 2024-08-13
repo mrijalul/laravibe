@@ -28,6 +28,7 @@
 					<thead>
 						<tr>
 							<th>Role</th>
+							<th>Users</th>
 							<th></th>
 						</tr>
 					</thead>
@@ -88,11 +89,15 @@
 			serverSide: true,
 			ajax: {
 				url: "{{ route('lv-admin.roles.getdata') }}",
-				type: "POST"
+				type: "POST",
+				data: {
+					_token: "{{ csrf_token() }}"
+				}
 			},
 			columns: [
-				{data: 'name', name: 'name'},
-				{data: 'action', name: 'action', orderable: false, searchable: false},
+				{ data: 'name', name: 'name' },
+				{ data: 'users', name: 'users', orderable: false, searchable: false, title: 'Users' },
+				{ data: 'action', name: 'action', orderable: false, searchable: false },
 			]
 		});
 

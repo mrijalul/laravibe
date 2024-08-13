@@ -13,8 +13,17 @@ class UserController extends Controller
 	function getdata(Request $request)
 	{
 		if ($request->ajax()) {
-			$data = User::select(['uuid', 'name', 'email', 'updated_at', 'created_at'])->orderBy('created_at', 'desc');
+			$data = User::with('roles')->select(['id', 'uuid', 'name', 'email', 'updated_at', 'created_at'])->orderBy('created_at', 'desc');
 			return DataTables::of($data)
+				->addColumn('roles', function ($row) {
+					if ($row->roles->isEmpty()) {
+						return '<span class="badge text-bg-warning">Belum memiliki relasi</span>';
+					} else {
+						return $row->roles->map(function ($role) {
+							return '<span class="badge text-bg-success">' . $role->name . '</span>';
+						})->implode(' ');
+					}
+				})
 				->addColumn('updated_at', function ($row) {
 					return $row->updated_at->format('Y-m-d H:i:s');
 				})
@@ -23,7 +32,7 @@ class UserController extends Controller
 					$btn .= ' <a href="javascript:void(0)" data-uuid="' . $row->uuid . '" class="btn btn-danger btn-sm deleteData"><i class="bi bi-trash"></i></a>';
 					return $btn;
 				})
-				->rawColumns(['action'])
+				->rawColumns(['action', 'roles'])
 				->make(true);
 		}
 	}

@@ -30,6 +30,7 @@
                         <tr>
                             <th>Fullname</th>
                             <th>Email</th>
+                            <th>Roles</th>
                             <th>Last Updated</th>
                             <th></th>
                         </tr>
@@ -93,6 +94,7 @@
             columns: [
                 {data: 'name', name: 'name'},
                 {data: 'email', name: 'email'},
+                {data: 'roles', name: 'roles', orderable: false, searchable: false, title: 'Roles'},
                 {data: 'updated_at', name: 'updated_at'},
                 {data: 'action', name: 'action', orderable: false, searchable: false},
             ]
