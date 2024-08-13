@@ -21,7 +21,6 @@ class RoleController extends Controller
                     <button class="btn btn-sm btn-warning editData" data-uuid="' . $row->uuid . '"><i class="bi bi-pencil-square"></i></button>
                     <button class="btn btn-sm btn-danger deleteData" data-uuid="' . $row->uuid . '"><i class="bi bi-trash"></i></button>
                     <button class="btn btn-sm btn-info assignRole" data-rolename="' . $row->name . '" data-uuid="' . $row->uuid . '"><i class="bi bi-person-plus"></i></button>
-                    <button class="btn btn-sm btn-secondary removeRole" data-uuid="' . $row->uuid . '" data-user-id=""><i class="bi bi-person-x"></i></button>
                 ';
 				})
 				->rawColumns(['action'])
@@ -107,7 +106,7 @@ class RoleController extends Controller
 		$user_ids = User::whereIn('uuid', $request->user_id)->pluck('id');
 
 		// Assign role ke users
-		$role->users()->syncWithoutDetaching($user_ids);
+		$role->users()->sync($user_ids);
 
 		return response()->json(['success' => 'Role berhasil ditambahkan ke user.']);
 	}
@@ -123,20 +122,5 @@ class RoleController extends Controller
 			->get();
 
 		return response()->json(['assignedUsers' => $assignedUsers]);
-	}
-
-	function removeRole(Request $request)
-	{
-		$request->validate([
-			'user_id' => 'required|exists:users,uuid',
-			'role_id' => 'required|exists:roles,uuid',
-		]);
-
-		$user = User::where('uuid', $request->user_id)->firstOrFail();
-		$role = Role::where('uuid', $request->role_id)->firstOrFail();
-
-		$user->roles()->detach($role->id);
-
-		return response()->json(['success' => 'Role berhasil dihapus dari user.']);
 	}
 }

@@ -218,21 +218,49 @@
 		}
 
 		$('body').on('click', '.assignRole', function () {
-			var role_id 	= $(this).data('uuid');
-			var role_name 	= $(this).data('rolename');
+			var role_id = $(this).data('uuid');
+			var role_name = $(this).data('rolename');
 			$('#assignRoleId').val(role_id);
 			$('#assignRoleModalLabel').html('Assign Role <b>' + role_name + '</b> to User');
 
+			var assignedUserIds = [];  // Array untuk menyimpan UUID user yang sudah di-assign
+
 			// Ambil data user yang sudah di-assign sebelumnya
 			$.ajax({
-				url: "{{ route('lv-admin.roles.getassigned.users') }}", // Rute untuk mengambil data user yang sudah di-assign
+				url: "{{ route('lv-admin.roles.getassigned.users') }}",
 				type: "POST",
 				data: {
 					_token: "{{ csrf_token() }}",
 					role_id: role_id
 				},
 				success: function (data) {
-					// Inisialisasi Select2 dengan data yang sudah di-assign sebelumnya
+					// Reset Select2
+					$('#user_id').empty();
+
+					// Jika ada user yang sudah di-assign, simpan UUID mereka di assignedUserIds
+					if (data.assignedUsers && data.assignedUsers.length > 0) {
+						assignedUserIds = $.map(data.assignedUsers, function (user) {
+							return user.uuid;
+						});
+
+						var assignedUsers = $.map(data.assignedUsers, function (user) {
+							return {
+								id: user.uuid,
+								text: user.name
+							};
+						});
+
+						// Masukkan user yang sudah di-assign sebagai pilihan default di Select2
+						$.each(assignedUsers, function (index, value) {
+							var option = new Option(value.text, value.id, true, true);
+							$('#user_id').append(option);
+						});
+
+						// Trigger change agar Select2 mengenali pilihan default
+						$('#user_id').trigger('change');
+					}
+
+					// Inisialisasi Select2 dengan data user yang belum di-assign
 					$('#user_id').select2({
 						theme: 'bootstrap-5',
 						ajax: {
@@ -246,13 +274,16 @@
 									search: params.term
 								};
 							},
-							processResults: function (data) {
+							processResults: function (response) {
 								return {
-									results: $.map(data.users, function (user) {
-										return {
-											id: user.uuid,
-											text: user.name
-										};
+									results: $.map(response.users, function (user) {
+										// Hanya tambahkan user yang belum di-assign
+										if (!assignedUserIds.includes(user.uuid)) {
+											return {
+												id: user.uuid,
+												text: user.name
+											};
+										}
 									})
 								};
 							},
@@ -263,22 +294,6 @@
 						placeholder: "Select User",
 						multiple: true
 					});
-
-					// Memasukkan user yang sudah di-assign sebagai pilihan default
-					if (data.assignedUsers && data.assignedUsers.length > 0) {
-						var assignedUsers = $.map(data.assignedUsers, function (user) {
-							return {
-								id: user.uuid,
-								text: user.name
-							};
-						});
-
-						// Tambahkan pengguna yang sudah di-assign ke dalam Select2
-						$.each(assignedUsers, function(index, value) {
-							var option = new Option(value.text, value.id, true, true);
-							$('#user_id').append(option).trigger('change');
-						});
-					}
 				},
 				error: function (data) {
 					console.log('Error:', data);

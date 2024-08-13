@@ -33,7 +33,6 @@ Route::prefix('lv-admin')->name('lv-admin.')->middleware('web')->group(function 
 
 	Route::prefix('roles')->name('roles.')->group(function () {
 		Route::post('role/assign', [RoleController::class, 'assignRole'])->name('assign');
-		Route::post('role/remove', [RoleController::class, 'removeRole'])->name('remove');
 
 		Route::post('role/get-data', [RoleController::class, 'getdata'])->name('getdata');
 		Route::post('role/get-data/user', [RoleController::class, 'getdatauser'])->name('getdata.user');
