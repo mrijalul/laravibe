@@ -27,10 +27,10 @@ class RoleController extends Controller
 				})
 				->addColumn('action', function ($row) {
 					return '
-                    <button class="btn btn-sm btn-warning editData" data-uuid="' . $row->uuid . '"><i class="bi bi-pencil-square"></i></button>
-                    <button class="btn btn-sm btn-danger deleteData" data-uuid="' . $row->uuid . '"><i class="bi bi-trash"></i></button>
-                    <button class="btn btn-sm btn-info assignRole" data-rolename="' . $row->name . '" data-uuid="' . $row->uuid . '"><i class="bi bi-person-plus"></i></button>
-                ';
+					<button class="btn btn-sm btn-warning editData" data-uuid="' . $row->uuid . '"><i class="bi bi-pencil-square"></i></button>
+					<button class="btn btn-sm btn-danger deleteData" data-uuid="' . $row->uuid . '"><i class="bi bi-trash"></i></button>
+					<button class="btn btn-sm btn-info assignRole" data-rolename="' . $row->name . '" data-uuid="' . $row->uuid . '"><i class="bi bi-person-plus"></i></button>
+				';
 				})
 				->rawColumns(['action', 'users'])
 				->make(true);

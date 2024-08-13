@@ -1,6 +1,6 @@
 <!-- Modal -->
 <div class="modal fade" id="ajaxModal" tabindex="-1" aria-labelledby="ajaxModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
+	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h1 class="modal-title fs-5" id="modelHeading">Add Role</h1>
@@ -29,7 +29,7 @@
 
 <!-- Modal Assign -->
 <div class="modal fade" id="assignRoleModal" tabindex="-1" aria-labelledby="assignRoleModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
+	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h1 class="modal-title fs-5" id="assignRoleModalLabel">Assign Role to User</h1>
@@ -50,31 +50,5 @@
 				</div>
 			</form>
 		</div>
-	</div>
-</div>
-
-<!-- Modal Remove Role -->
-<div class="modal fade" id="removeRoleModal" tabindex="-1" aria-labelledby="removeRoleModalLabel" aria-hidden="true">
-	<div class="modal-dialog">
-		<form id="removeRoleForm">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="removeRoleModalLabel">Remove Role from User</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<input type="hidden" id="removeRoleId" name="role_id">
-
-					<div class="mb-3">
-						<label for="remove_user_id" class="form-label">Select User(s)</label>
-						<select id="remove_user_id" name="user_id[]" class="form-select" multiple="multiple"
-							style="width: 100%;"></select>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="submit" class="btn btn-danger">Remove Role</button>
-				</div>
-			</div>
-		</form>
 	</div>
 </div>

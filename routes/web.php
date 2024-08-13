@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -31,6 +32,7 @@ Route::prefix('lv-admin')->name('lv-admin.')->middleware('web')->group(function 
 		Route::resource('user', UserController::class)->only('index', 'store', 'destroy', 'edit');
 	});
 
+	// group roles
 	Route::prefix('roles')->name('roles.')->group(function () {
 		Route::post('role/assign', [RoleController::class, 'assignRole'])->name('assign');
 
@@ -39,5 +41,11 @@ Route::prefix('lv-admin')->name('lv-admin.')->middleware('web')->group(function 
 		Route::post('roles/getassigned/users', [RoleController::class, 'getAssignedUsers'])->name('getassigned.users');
 
 		Route::resource('role', RoleController::class)->only('index', 'store', 'destroy', 'edit');
+	});
+
+	// group permission
+	Route::prefix('permissions')->name('permissions.')->group(function () {
+		Route::post('permission/get-data', [PermissionController::class, 'getdata'])->name('getdata');
+		Route::resource('permission', PermissionController::class)->only('index', 'store', 'destroy', 'edit');
 	});
 });

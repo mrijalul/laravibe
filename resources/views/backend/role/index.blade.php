@@ -132,13 +132,12 @@
 				type: "POST",
 				dataType: 'json',
 				success: function (data) {
-					resetForm();  // Reset form setelah data disimpan
+					resetForm();
 					
 					$('#ajaxModal').modal('hide');
 					
 					table.draw();
 
-					// Menghapus semua kelas is-invalid dan pesan error
 					$('input').removeClass('is-invalid');
 					$('.text-danger').remove();
 
@@ -153,10 +152,8 @@
 				error: function (data) {
 					$('#saveBtn').html('Save changes');
 					
-					// Clear previous error messages
 					$('.text-danger').remove();
-					
-					// Display error messages below each input
+
 					if (data.responseJSON && data.responseJSON.errors) {
 						$.each(data.responseJSON.errors, function (key, value) {
 							let input = $('input[name=' + key + ']');
@@ -165,7 +162,6 @@
 						});
 					}
 
-					// Display toast notification
 					$.toast({
 						heading: 'Error',
 						text: 'Please fix the errors and try again.',
@@ -215,11 +211,10 @@
 		});
 
 		function resetAssignRoleForm() {
-			// Reset form
+			
 			$('#assignRoleForm')[0].reset();
 
-			// Reset Select2
-			$('#user_id').val(null).trigger('change'); // Reset pilihan di Select2
+			$('#user_id').val(null).trigger('change');
 		}
 
 		$('body').on('click', '.assignRole', function () {
@@ -228,9 +223,8 @@
 			$('#assignRoleId').val(role_id);
 			$('#assignRoleModalLabel').html('Assign Role <b>' + role_name + '</b> to User');
 
-			var assignedUserIds = [];  // Array untuk menyimpan UUID user yang sudah di-assign
+			var assignedUserIds = [];
 
-			// Ambil data user yang sudah di-assign sebelumnya
 			$.ajax({
 				url: "{{ route('lv-admin.roles.getassigned.users') }}",
 				type: "POST",
@@ -239,10 +233,8 @@
 					role_id: role_id
 				},
 				success: function (data) {
-					// Reset Select2
 					$('#user_id').empty();
 
-					// Jika ada user yang sudah di-assign, simpan UUID mereka di assignedUserIds
 					if (data.assignedUsers && data.assignedUsers.length > 0) {
 						assignedUserIds = $.map(data.assignedUsers, function (user) {
 							return user.uuid;
@@ -255,17 +247,14 @@
 							};
 						});
 
-						// Masukkan user yang sudah di-assign sebagai pilihan default di Select2
 						$.each(assignedUsers, function (index, value) {
 							var option = new Option(value.text, value.id, true, true);
 							$('#user_id').append(option);
 						});
 
-						// Trigger change agar Select2 mengenali pilihan default
 						$('#user_id').trigger('change');
 					}
 
-					// Inisialisasi Select2 dengan data user yang belum di-assign
 					$('#user_id').select2({
 						theme: 'bootstrap-5',
 						ajax: {
@@ -282,7 +271,6 @@
 							processResults: function (response) {
 								return {
 									results: $.map(response.users, function (user) {
-										// Hanya tambahkan user yang belum di-assign
 										if (!assignedUserIds.includes(user.uuid)) {
 											return {
 												id: user.uuid,
