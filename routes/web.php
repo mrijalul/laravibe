@@ -40,6 +40,10 @@ Route::prefix('lv-admin')->name('lv-admin.')->middleware('web')->group(function 
 		Route::post('role/get-data/user', [RoleController::class, 'getdatauser'])->name('getdata.user');
 		Route::post('roles/getassigned/users', [RoleController::class, 'getAssignedUsers'])->name('getassigned.users');
 
+		Route::post('assign-permissions', [RoleController::class, 'assignPermissions'])->name('assign.permissions');
+		Route::post('permissions/getdata', [RoleController::class, 'getPermissionsData'])->name('permissions.getdata');
+		Route::post('permission/assigned-permissions', [RoleController::class, 'getAssignedPermissions'])->name('permissions.getassigned');
+
 		Route::resource('role', RoleController::class)->only('index', 'store', 'destroy', 'edit');
 	});
 

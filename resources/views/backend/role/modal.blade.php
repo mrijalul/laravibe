@@ -27,7 +27,7 @@
 	</div>
 </div>
 
-<!-- Modal Assign -->
+<!-- Modal Assign Role -->
 <div class="modal fade" id="assignRoleModal" tabindex="-1" aria-labelledby="assignRoleModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
@@ -47,6 +47,34 @@
 				<div class="modal-footer">
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 					<button type="submit" class="btn btn-primary" id="assignRoleBtn">Assign</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Modal Assign Permission -->
+<div class="modal fade" id="assignPermissionModal" tabindex="-1" aria-labelledby="assignPermissionModalLabel"
+	aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="assignPermissionModalLabel">Assign Permissions to Role</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<form id="assignPermissionForm" name="assignPermissionForm">
+				<div class="modal-body">
+					<input type="hidden" name="role_id" id="assignRolePermissionId" class="assignRolePermissionClass">
+					<div class="mb-3" id="labelPermissionID">
+						<label for="permission_id" class="col-sm-2 control-label">Permissions</label>
+						<select class="form-control" id="permission_id" name="permission_id[]" multiple="multiple"
+							required>
+						</select>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary" id="assignPermissionBtn">Assign</button>
 				</div>
 			</form>
 		</div>

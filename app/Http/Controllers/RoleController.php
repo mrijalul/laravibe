@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -26,13 +27,16 @@ class RoleController extends Controller
 					}
 				})
 				->addColumn('action', function ($row) {
-					return '
-					<button class="btn btn-sm btn-warning editData" data-uuid="' . $row->uuid . '"><i class="bi bi-pencil-square"></i></button>
-					<button class="btn btn-sm btn-danger deleteData" data-uuid="' . $row->uuid . '"><i class="bi bi-trash"></i></button>
-					<button class="btn btn-sm btn-info assignRole" data-rolename="' . $row->name . '" data-uuid="' . $row->uuid . '"><i class="bi bi-person-plus"></i></button>
-				';
+					return '<button class="btn btn-sm btn-warning editData" data-uuid="' . $row->uuid . '"><i class="bi bi-pencil-square"></i></button>
+					<button class="btn btn-sm btn-danger deleteData" data-uuid="' . $row->uuid . '"><i class="bi bi-trash"></i></button>';
 				})
-				->rawColumns(['action', 'users'])
+				->addColumn('role', function ($row) {
+					return '<button class="btn btn-sm btn-info assignRole" data-rolename="' . $row->name . '" data-uuid="' . $row->uuid . '"><i class="bi bi-person-plus"></i></button>';
+				})
+				->addColumn('permission', function ($row) {
+					return '<button class="btn btn-sm btn-info assignPermission" data-rolename="' . $row->name . '" data-uuid="' . $row->uuid . '"><i class="bi bi-shield-plus"></i></button>';
+				})
+				->rawColumns(['action', 'users', 'role', 'permission'])
 				->make(true);
 		}
 	}
@@ -127,5 +131,43 @@ class RoleController extends Controller
 			->get();
 
 		return response()->json(['assignedUsers' => $assignedUsers]);
+	}
+
+	function assignPermissions(Request $request)
+	{
+		$request->validate([
+			'role_id' => 'required|exists:roles,uuid',
+			'permission_id' => 'required|array',
+			'permission_id.*' => 'exists:permissions,uuid',
+		]);
+
+		$role = Role::where('uuid', $request->role_id)->firstOrFail();
+		$permissionIds = Permission::whereIn('uuid', $request->permission_id)->pluck('id');
+
+		$role->permissions()->sync($permissionIds);
+
+		return response()->json(['success' => 'Permissions berhasil di-assign ke role.']);
+	}
+
+	function getPermissionsData(Request $request)
+	{
+		$search = $request->input('search');
+		$permissions = Permission::where('name', 'like', "%{$search}%")
+			->get(['id', 'uuid', 'name']);
+
+		return response()->json(['permissions' => $permissions]);
+	}
+
+	function getAssignedPermissions(Request $request)
+	{
+		$role_id = $request->input('role_id');
+
+		$assignedPermissions = Permission::select('uuid', 'name')
+			->whereHas('roles', function ($query) use ($role_id) {
+				$query->where('roles.uuid', $role_id);
+			})
+			->get();
+
+		return response()->json(['assignedPermissions' => $assignedPermissions]);
 	}
 }

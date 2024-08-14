@@ -16,16 +16,16 @@ class Permission extends Model
 		'uuid' => 'string',
 	];
 
+	public function roles()
+	{
+		return $this->belongsToMany(Role::class, 'role_permission', 'permission_id', 'role_id');
+	}
+
 	protected static function boot()
 	{
 		parent::boot();
 		static::creating(function ($model) {
 			$model->uuid = (string) Str::uuid();
 		});
-	}
-
-	public function roles()
-	{
-		return $this->belongsToMany(Role::class, 'role_permission');
 	}
 }

@@ -29,6 +29,8 @@
 						<tr>
 							<th>Role</th>
 							<th>Users</th>
+							<th>Assign Role</th>
+							<th>Assign Permission</th>
 							<th></th>
 						</tr>
 					</thead>
@@ -97,6 +99,8 @@
 			columns: [
 				{ data: 'name', name: 'name' },
 				{ data: 'users', name: 'users', orderable: false, searchable: false, title: 'Users' },
+				{ data: 'role', name: 'role', orderable: false, searchable: false },
+				{ data: 'permission', name: 'permission', orderable: false, searchable: false },
 				{ data: 'action', name: 'action', orderable: false, searchable: false },
 			]
 		});
@@ -296,7 +300,6 @@
 			$('#assignRoleModal').modal('show');
 		});
 
-
 		$('#assignRoleForm').submit(function (e) {
 			e.preventDefault();
 			var formData = $(this).serialize();
@@ -318,6 +321,126 @@
 						position: 'top-right'
 					});
 					resetAssignRoleForm();
+				},
+				error: function (data) {
+					console.log('Error:', data);
+					$.toast({
+						heading: 'Error',
+						text: 'Terjadi kesalahan saat mengassign role.',
+						showHideTransition: 'fade',
+						icon: 'error',
+						position: 'top-right'
+					});
+				}
+			});
+		});
+
+		function resetFormPermission() {
+			$('#assignPermissionForm').trigger("reset");
+			$('#assignPermissionId').val('');
+			$('#assignPermissionModalLabel').html("Assign Permissions");
+			$('#assignPermissionBtn').html('Assign');
+			$('#permissions').val(null).trigger('change');  // Reset select2
+		}
+
+		$('body').on('click', '.assignPermission', function () {
+			var permission_role_id = $(this).data('uuid');
+			var permission_role_name = $(this).data('rolename');
+			console.log('role_id : ',permission_role_id)
+			$('.assignRolePermissionClass').val(permission_role_id);
+			$('#assignPermissionModalLabel').html('Assign Permissions to <b>' + permission_role_name + '</b>');
+
+			var assignedPermissionIds = [];
+
+			$.ajax({
+				url: "{{ route('lv-admin.roles.permissions.getassigned') }}",
+				type: "POST",
+				data: {
+					_token: "{{ csrf_token() }}",
+					role_id: permission_role_id
+				},
+				success: function (data) {
+					$('#permission_id').empty();
+
+					if (data.assignedPermissions && data.assignedPermissions.length > 0) {
+						assignedPermissionIds = $.map(data.assignedPermissions, function (permission) {
+							return permission.uuid;
+						});
+
+						var assignedPermissions = $.map(data.assignedPermissions, function (permission) {
+							return {
+								id: permission.uuid,
+								text: permission.name
+							};
+						});
+
+						$.each(assignedPermissions, function (index, value) {
+							var option = new Option(value.text, value.id, true, true);
+							$('#permission_id').append(option);
+						});
+
+						$('#permission_id').trigger('change');
+					}
+
+					$('#permission_id').select2({
+						theme: 'bootstrap-5',
+						ajax: {
+							url: "{{ route('lv-admin.roles.permissions.getdata') }}",
+							type: "POST",
+							dataType: 'json',
+							delay: 250,
+							data: function (params) {
+								return {
+									_token: "{{ csrf_token() }}",
+									search: params.term
+								};
+							},
+							processResults: function (response) {
+								return {
+									results: $.map(response.permissions, function (permission) {
+										if (!assignedPermissionIds.includes(permission.uuid)) {
+											return {
+												id: permission.uuid,
+												text: permission.name
+											};
+										}
+									})
+								};
+							},
+							cache: true
+						},
+						minimumInputLength: 0,
+						dropdownParent: $('#assignPermissionModal'),
+						placeholder: "Select Permissions",
+						multiple: true
+					});
+				},
+				error: function (data) {
+					console.log('Error:', data);
+				}
+			});
+
+			$('#assignPermissionModal').modal('show');
+		});
+
+		$('#assignPermissionForm').on('submit', function (e) {
+			e.preventDefault();
+
+			$.ajax({
+				url: "{{ route('lv-admin.roles.assign.permissions') }}",
+				type: "POST",
+				data: $(this).serialize(),
+				success: function (data) {
+					$('#assignPermissionModal').modal('hide');
+					resetFormPermission();
+					$('#rolesTable').DataTable().ajax.reload();
+					$.toast({
+						heading: 'Success',
+						text: data.success,
+						showHideTransition: 'slide',
+						icon: 'success',
+						position: 'top-right'
+					});
 				},
 				error: function (data) {
 					console.log('Error:', data);
